@@ -1,0 +1,116 @@
+main:
+define TRUE 1
+define FALSE 0
+define MAXBURNPIPEPRESSURE 3.9
+
+#RETURN CODES
+#return 0 = off - logic
+#return 1 = OK
+#return 2 = Uncaught Error^
+#return 3 = waiting
+#return 6 = off - user intervention
+
+alias COOLING d0
+alias ANALYZER d1
+alias N2O d2
+alias VOL d3
+alias INTAKEGASSUPPLYDIAL d5
+alias MIXER d4
+alias RETURN db
+
+#s INTAKEGASSUPPLYDIAL Mode 10
+l r5 INTAKEGASSUPPLYDIAL Setting
+l r1 ANALYZER Pressure
+l r0 COOLING Setting
+
+beq r5 0 turnoff
+beq r5 1 flame1
+beq r5 2 flame2
+beq r5 3 flame3
+beq r5 4 flame4
+beq r5 5 flame5
+beq r5 6 flame6
+beq r5 7 flame7
+beq r5 8 flame8
+beq r5 9 flame9
+beq r5 10 flame10
+
+flame1:
+s N2O Setting 0.2
+s VOL Setting 0.2
+j start
+flame2:
+s N2O Setting 0.5
+s VOL Setting 0.5
+j start
+flame3:
+s N2O Setting 0.8
+s VOL Setting 0.8
+j start
+flame4:
+s N2O Setting 1.0
+s VOL Setting 1.0
+j start
+flame5:
+s N2O Setting 1.2
+s VOL Setting 1.2
+j start
+flame6:
+s N2O Setting 1.5
+s VOL Setting 1.5
+j start
+flame7:
+s N2O Setting 2
+s VOL Setting 2
+j start
+flame8:
+s N2O Setting 2.5
+s VOL Setting 2.5
+j start
+flame9:
+s N2O Setting 2.9
+s VOL Setting 2.9
+j start
+flame10:
+s N2O Setting 3.2
+s VOL Setting 3.2
+j start
+start:
+
+beq r0 1 mix # if cooling is status OK
+beq r0 3 mix # if cooling is status waiting
+beq r0 4 mix # if cooling is status venting
+s RETURN Setting 0 # else return stop - logic
+s MIXER On FALSE
+j main
+mix:
+bgt r1 MAXBURNPIPEPRESSURE wait # if Pressure in FuelPipe is higher than VAR kPa.
+s N2O On 1
+s VOL On 1 # can always be on
+s MIXER On TRUE
+s RETURN Setting 1
+j main
+
+stop:
+s MIXER On FALSE
+s N2O On 0
+s VOL On 0
+s RETURN Setting 0
+j main
+
+wait:
+s MIXER On FALSE
+s N2O On 0
+s VOL On 0
+s RETURN Setting 3
+j main
+
+turnoff:
+s MIXER On FALSE
+s N2O On 0
+s VOL On 0
+s RETURN Setting 6
+j main
+
+s RETURN Setting 2 # the execution shouldnt be here
+j stop

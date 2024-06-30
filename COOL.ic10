@@ -1,0 +1,81 @@
+main:
+define TRUE 1
+define FALSE 0
+define minChamberTemp 280 # 6.85 Celsius
+define workingTemp 300 # 26.85 Celsius
+define desiredChamberTemp 290 # 16.85 Celsius
+define dangerousChamberTemp 325 # 51.85 Celsius
+define minChamberPressure 25
+define maxChamberPressure 50
+
+#RETURN CODES
+#return 0 = off - logic
+#return 1 = OK
+#return 2 = Uncaught Error
+#return 3 = waiting
+#return 4 = venting
+#return 7 = pressurizing
+#return 8 = depressurizing
+
+alias AVENTINT d0
+alias OUTSIDEVENTCONTROL d1
+alias OUTSIDEVENT2 d2
+alias OUTSIDEVENT3 d3
+alias SENSINT d4
+alias SENSEXT d5
+alias RETURN db
+s AVENTINT PressureExternal 25
+l r5 SENSEXT Temperature #EXT
+l r4 SENSINT Temperature #INT
+l r6 SENSINT Pressure #INT
+
+blt r5 workingTemp checkcool
+bgt r5 workingTemp shutdown
+s RETURN Setting 0 # return off - logic
+j main
+
+checkcool:
+blt r6 minChamberPressure pressurize
+blt r4 minChamberTemp wait
+bgt r4 minChamberTemp cooldown
+j main
+
+cooldown:
+blt r6 minChamberPressure pressurize # if the int pressure is below X, vent
+bgt r4 desiredChamberTemp ventilatestart # if int temp is more then X, vent
+bgt r4 dangerousChamberTemp shutdown # power off if too hot
+s RETURN Setting 1 # return OK
+j wait
+#s AVENTINT On FALSE
+#s OUTSIDEVENT1 On FALSE
+#s OUTSIDEVENT2 On FALSE
+#s OUTSIDEVENT3 On FALSE
+#s db Setting TRUE #atmosphere should be good if code reaches this line
+#j main
+
+wait:
+#bgt r6 maxChamberPressure depressurize
+s AVENTINT On FALSE
+s RETURN Setting 3 # return waiting
+s OUTSIDEVENTCONTROL Setting FALSE
+j main
+
+ventilatestart:
+s AVENTINT On TRUE
+s OUTSIDEVENTCONTROL Setting TRUE
+s RETURN Setting 4 # return venting
+j main
+
+depressurize:
+s AVENTINT On TRUE
+s RETURN Setting 8 # return depressurizing
+j main
+
+pressurize:
+s OUTSIDEVENTCONTROL Setting TRUE
+s RETURN Setting 7
+j main
+
+shutdown:
+s RETURN Setting 0 # return off - logic
+j wait

@@ -1,0 +1,48 @@
+main:
+define TRUE 1
+define FALSE 0
+define MAXBATTERYCHARGE 8000000
+#RETURN CODES
+#return 0 = off - logic
+#return 1 = OK, Burning
+#return 2 = Uncaught Error
+#return 9 = reburning
+
+alias RETURN db
+alias MIX d0
+alias GENERATOR d1
+alias BATTERY0 d3
+alias WARN d5
+
+l r0 MIX Setting
+l r1 GENERATOR PowerGeneration
+l r3 BATTERY0 Charge
+
+
+bgt r3 MAXBATTERYCHARGE stopburn
+beq r0 1 preburn # if MIXING is status OK
+beq r0 3 preburn # if MIXING is status waiting
+j stopburn # else stop the burn
+
+preburn:
+beq r1 0 reburn
+s RETURN Setting 1 # return OK
+s WARN On FALSE
+j main
+
+reburn:
+s GENERATOR On FALSE
+s GENERATOR On TRUE
+s RETURN Setting 9 # return reburning
+s WARN On TRUE
+j main
+
+stopburn:
+s GENERATOR On FALSE
+s RETURN Setting 0 # return off - logic
+s WARN On FALSE
+j main
+
+# the execution shouldnt be here
+s RETURN Setting 2 # return Uncaught Error
+j stopburn

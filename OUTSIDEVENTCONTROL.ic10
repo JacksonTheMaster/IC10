@@ -1,0 +1,37 @@
+main:
+define TRUE 1
+define FALSE 0
+
+#RETURN CODES
+#return 0 = off - logic
+#return 4 = venting
+
+alias VENSETTINGMEM d0
+alias OUTSIDEVENT1 d1
+alias OUTSIDEVENT2 d2
+alias OUTSIDEVENT3 d3
+alias OUTSIDEVENT4 d4
+alias OUTSIDEVENT5 d5
+alias RETURN db
+
+l r0 VENSETTINGMEM Setting
+beq r0 TRUE ventilize
+beq r0 FALSE pause
+
+ventilize:
+s OUTSIDEVENT1 On TRUE
+s OUTSIDEVENT2 On TRUE
+s OUTSIDEVENT3 On TRUE
+s OUTSIDEVENT4 On TRUE
+s OUTSIDEVENT5 On TRUE
+s RETURN Setting 4
+j main
+
+pause:
+s OUTSIDEVENT1 On FALSE
+s OUTSIDEVENT2 On FALSE
+s OUTSIDEVENT3 On FALSE
+s OUTSIDEVENT4 On FALSE
+s OUTSIDEVENT5 On FALSE
+s RETURN Setting 0
+j main

@@ -1,0 +1,11 @@
+#RETURN CODES GLOBAL
+#return 0 = off - logic
+#return 1 = OK
+#return 2 = Uncaught Error
+#return 3 = waiting
+#return 4 = venting
+#return 5 = EMPTY
+#return 6 = off - user intervention
+#return 7 = pressurizing
+#return 8 = depressurizing
+#return 9 = reburning

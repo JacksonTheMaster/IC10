@@ -1,0 +1,93 @@
+main:
+define TRUE 1
+define FALSE 0
+
+#RETURN CODES
+#return 0 = off - logic
+#return 1 = OK
+#return 2 = Uncaught Error
+
+l r0 d0 Setting
+l r1 d0 Mode
+l r2 d1 Open
+l r3 d2 Temperature
+
+blt r3 258 flame10 # if temp is lower than 265 K / -15.15 Celsius
+blt r3 265 flame9 # if temp is lower than 265 K / -8.15 Celsius
+blt r3 275 flame8 # if temp is lower than 275 K / 1,85 Celsius
+blt r3 283 flame7 # if temp is lower than 283 K / 9,85 Celsius
+blt r3 289 flame6 # if temp is lower than 289 K / 15,85 Celsius
+blt r3 293 flame4 # if temp is lower than 293 K / 19,85 Celsius
+blt r3 296 flame3 # if temp is lower than 296 K / 22,85 Celsius
+blt r3 298 flame2 # if temp is lower than 298 K / 24,85 Celsius
+blt r3 299 flame1 # if temp is lower than 299 K / 25,85 Celsius
+bgt r3 299 flame1 # if temp is higher than 299 K / 25,85 Celsius
+s db Setting 13
+j main
+
+flame10:
+s d0 Mode 10
+beq r2 1 override
+s db Setting 110
+s d0 Setting 10
+j main
+
+flame9:
+s d0 Mode 9
+beq r2 1 override
+s db Setting 109
+s d0 Setting 9
+j main
+
+flame8:
+s d0 Mode 8
+beq r2 1 override
+s db Setting 108
+s d0 Setting 8
+j main
+
+flame7:
+s d0 Mode 7
+beq r2 1 override
+s db Setting 107
+s d0 Setting 7
+j main
+
+flame6:
+s d0 Mode 6
+beq r2 1 override
+s db Setting 106
+s d0 Setting 6
+j main
+
+flame4:
+s d0 Mode 4
+beq r2 1 override
+s db Setting 104
+s d0 Setting 4
+j main
+
+flame3:
+s d0 Mode 3
+beq r2 1 override
+s db Setting 103
+s d0 Setting 3
+j main
+
+flame2:
+s d0 Mode 2
+beq r2 1 override
+s db Setting 102
+s d0 Setting 2
+j main
+
+flame1:
+s d0 Mode 1
+beq r2 1 override
+s db Setting 101
+s d0 Setting 1
+j main
+
+override:
+s db Setting 6
+j main
