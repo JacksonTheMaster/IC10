@@ -1,0 +1,39 @@
+# Filter control for the AC system
+main:
+alias FILTER d0 #local filter
+alias AC d1    #remote AC
+
+define TRUE 1            # Define TRUE as 1
+define FALSE 0           # Define FALSE as 0
+define MaxBaseTemp 299  # Maximum base temperature threshold (25.85C)
+define baseTempDiff 5       # Temperature difference threshold (5 Kelvin)
+
+# Load the temperature input and output
+l r1 d1 TemperatureOutput
+l r2 d2 Temperature
+# Main control loop
+abs r2 r2
+bgt r2 MaxBaseTemp cool  # If r0 > threshold, go to cool
+j wait
+
+wait:
+s FILTER On FALSE
+s AC On FALSE
+s db Setting FALSE
+j main
+
+cool:
+s FILTER On TRUE          # Set local On to TRUE
+s AC On TRUE #Set AC On
+s AC Mode 1 # Start AC
+s db Setting TRUE
+sub r3 r2 r1
+abs r3 r3
+blt r3 baseTempDiff baseTempDiffwait  
+j main                  
+
+baseTempDiffwait:
+s FILTER On FALSE
+s AC On FALSE
+s db Setting FALSE
+j main

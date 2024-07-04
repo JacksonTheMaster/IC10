@@ -1,7 +1,10 @@
 main:
 define TRUE 1
 define FALSE 0
-define MAXBATTERYCHARGE 8000000
+define MAXBATTERYCHARGE 9000000
+define LOWBATTERYTHRESHOLD 5000000
+define HIGHBATTERYTHRESHOLD 6400000
+
 #RETURN CODES
 #return 0 = off - logic
 #return 1 = OK, Burning
@@ -18,8 +21,11 @@ l r0 MIX Setting
 l r1 GENERATOR PowerGeneration
 l r3 BATTERY0 Charge
 
+ble r3 LOWBATTERYTHRESHOLD checkConditions
 
-bgt r3 MAXBATTERYCHARGE stopburn
+bge r3 HIGHBATTERYTHRESHOLD wait
+
+checkConditions:
 beq r0 1 preburn # if MIXING is status OK
 beq r0 3 preburn # if MIXING is status waiting
 j stopburn # else stop the burn
@@ -43,6 +49,12 @@ s RETURN Setting 0 # return off - logic
 s WARN On FALSE
 j main
 
-# the execution shouldnt be here
+wait:
+s GENERATOR On FALSE
+s RETURN Setting 3 # return waiting
+s WARN On FALSE
+j main
+
+# the execution shouldn't be here
 s RETURN Setting 2 # return Uncaught Error
 j stopburn
