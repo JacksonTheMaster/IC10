@@ -1,9 +1,10 @@
 main:
 define TRUE 1
 define FALSE 0
-define MAXBATTERYCHARGE 9000000
-define LOWBATTERYTHRESHOLD 5000000
-define HIGHBATTERYTHRESHOLD 6400000
+define LOWBATTERYTHRESHOLD 1000000
+define HIGHBATTERYTHRESHOLD 8000000
+define SPEAKER HASH("StructureKlaxon")
+define REBURNALARM HASH("REBURNALARM")
 
 #RETURN CODES
 #return 0 = off - logic
@@ -20,41 +21,41 @@ alias WARN d5
 l r0 MIX Setting
 l r1 GENERATOR PowerGeneration
 l r3 BATTERY0 Charge
+ble r3 LOWBATTERYTHRESHOLD enableGenerator
+bge r3 HIGHBATTERYTHRESHOLD disableGenerator
+sbn SPEAKER REBURNALARM On 0
+s WARN On FALSE
+j main
 
-ble r3 LOWBATTERYTHRESHOLD checkConditions
-
-bge r3 HIGHBATTERYTHRESHOLD wait
-
-checkConditions:
+enableGenerator:
 beq r0 1 preburn # if MIXING is status OK
 beq r0 3 preburn # if MIXING is status waiting
-j stopburn # else stop the burn
+j disableGenerator
 
 preburn:
 beq r1 0 reburn
 s RETURN Setting 1 # return OK
 s WARN On FALSE
+
+
 j main
 
 reburn:
-s GENERATOR On FALSE
-s GENERATOR On TRUE
-s RETURN Setting 9 # return reburning
 s WARN On TRUE
+sbn SPEAKER REBURNALARM On 1
+yield
+s GENERATOR On TRUE # Only turn on the generator, don't toggle off
+s RETURN Setting 9 # return reburning
+s WARN On FALSE
+sbn SPEAKER REBURNALARM On 0
 j main
 
-stopburn:
+disableGenerator:
 s GENERATOR On FALSE
 s RETURN Setting 0 # return off - logic
 s WARN On FALSE
 j main
 
-wait:
-s GENERATOR On FALSE
-s RETURN Setting 3 # return waiting
-s WARN On FALSE
-j main
-
 # the execution shouldn't be here
 s RETURN Setting 2 # return Uncaught Error
-j stopburn
+j disableGenerator                                                                                                                                  

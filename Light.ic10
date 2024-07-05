@@ -1,0 +1,58 @@
+main:
+define TRUE 1
+define FALSE 0
+define Light HASH("StructureWallLightBattery")
+define Switch HASH("StructureLogicSwitch2")
+define HallLightA HASH("HallLightA")
+define HallLightB HASH("HallLightB")
+define HallLightFarm HASH("HallLightFarm")
+define HallLightCrafting HASH("HallLightCrafting")
+define HallLightHallwayStorage HASH("HallLightHallwayStorage")
+define HallLightHallStorage HASH("HallLightHallStorage")
+define SWHallLightA HASH("SWHallLightA")
+define SWHallLightB HASH("SWHallLightB")
+define SWHallLightFarm HASH("SWHallLightFarm")
+define SWHallLightCrafting HASH("SWHallLightCrafting")
+define SWHallLightHallwayStorage HASH("SWHallLightHallwayStorage")
+define SWHallLightHallStorage HASH("SWHallLightHallStorage")
+
+alias RETURN db
+
+jal checkHallLightA
+jal checkHallLightB
+jal checkHallLightFarm
+jal checkHallLightCrafting
+jal checkHallLightHallwayStorage
+jal checkHallLightHallStorage
+s RETURN Setting TRUE
+j main
+
+checkHallLightA:
+lbn r1 Switch SWHallLightA Open Sum
+sbn Light HallLightA On r1
+j ra # jump to return address
+
+checkHallLightB:
+lbn r1 Switch SWHallLightB Open Sum
+sbn Light HallLightB On r1
+j ra # jump to return address
+
+checkHallLightFarm:
+lbn r1 Switch SWHallLightFarm Open Sum
+sbn Light HallLightFarm On r1
+j ra # jump to return address
+
+checkHallLightCrafting:
+lbn r1 Switch SWHallLightCrafting Open Sum
+sbn Light HallLightCrafting On r1
+j ra # jump to return address
+
+checkHallLightHallwayStorage:
+lbn r1 Switch SWHallLightHallwayStorage Open Sum
+sbn Light HallLightHallwayStorage On r1
+j ra # jump to return address
+
+checkHallLightHallStorage:
+lbn r1 Switch SWHallLightHallStorage Open Sum
+sbn Light HallLightHallStorage On r1
+j ra # jump to return address

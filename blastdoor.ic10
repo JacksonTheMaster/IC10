@@ -1,0 +1,21 @@
+main:
+define BlastDoor d0
+define ButtonIN d1
+define ButtonOUT d2
+
+l r1 d1 Activate
+l r2 d2 Activate
+beq r1 1 open
+beq r2 1 open
+beq r1 0 close
+beq r2 0 close
+j main
+
+open:
+s d0 Open 1
+sleep 5
+j ra
+
+close:
+s d0 Open 0
+j ra

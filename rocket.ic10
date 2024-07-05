@@ -1,0 +1,128 @@
+define Engine HASH("StructureGovernedGasEngine")
+define Avionics HASH("StructureRocketAvionics")
+define Scanner HASH("StructureRocketScanner")
+define Miner HASH("StructureRocketMiner")
+define GasCon HASH("StructureGasUmbilicalMale")
+define ChuteCon HASH("StructureChuteUmbilicalMale")
+define PowerCon HASH("StructurePowerUmbilicalMale")
+define Speaker HASH("StructureKlaxon")
+define TRUE 1
+define FALSE 0
+alias TargetStatus r0
+alias Target r1
+alias RocketOnGround r2
+alias isPowerCon r3
+alias isChuteCon r4
+alias isGasCon r5
+alias RocketMode r6
+
+#RocketModes:
+#1 = flight
+#2 = Mine
+#3 = Survey
+#4 = Discover
+#5 = Chart
+
+main:
+#load data about rocket
+yield
+lb Target Avionics DestinationCode Sum
+lb RocketMode Avionics Mode Sum
+sb Speaker On 0
+sgtz TargetStatus Target
+beq TargetStatus 1 isRocketOnGround
+beq RocketMode 2 initmine
+beq RocketMode 3 initsurvey
+beq RocketMode 4 initdiscover
+beq RocketMode 5 initchart
+j initfloat
+j main
+
+isRocketOnGround:
+lb isGasCon GasCon Error Sum
+lb isChuteCon ChuteCon Error Sum
+lb isPowerCon PowerCon Error Sum
+s db Setting RocketOnGround
+yield
+
+sub RocketOnGround RocketOnGround RocketOnGround
+s db Setting RocketOnGround
+yield
+
+add RocketOnGround RocketOnGround isGasCon
+s db Setting RocketOnGround
+yield
+
+add RocketOnGround RocketOnGround isChuteCon
+s db Setting RocketOnGround
+yield
+
+add RocketOnGround RocketOnGround isPowerCon
+s db Setting RocketOnGround
+yield
+
+seqz RocketOnGround RocketOnGround
+s db Setting RocketOnGround
+yield
+
+beq RocketOnGround TRUE countdown
+beq RocketOnGround FALSE initstart
+
+j error #code should never reach this line
+
+countdown:
+yield
+sb Speaker Mode 7
+sb Speaker On 1
+#s db Setting 7
+#sleep 15
+sb Speaker Mode 33
+s db Setting 33
+sleep 1.5
+sb Speaker Mode 32
+s db Setting 32
+sleep 1.5
+sb Speaker Mode 31
+s db Setting 31
+sleep 1.5
+sb Speaker Mode 30
+s db Setting 30
+sleep 1.5
+sb Speaker Mode 29
+s db Setting 29
+sleep 1.5
+sb Speaker Mode 35
+s db Setting 35
+sleep 1.5
+sb Speaker On 0
+j initstart
+
+initstart:
+sb Scanner On FALSE
+sb Miner On FALSE
+#sb Engine On TRUE
+#s db Setting 100
+j main
+
+initmine:
+sb Scanner On FALSE
+sb Miner On TRUE
+j main
+
+initsurvey:
+sb Miner On FALSE
+sb Scanner On TRUE
+
+j main
+
+initdiscover:
+sb Miner On FALSE
+sb Scanner On TRUE
+j main
+
+initchart:
+sb Miner On FALSE
+sb Scanner On TRUE
+j main
+
+initfloat:
