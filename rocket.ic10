@@ -39,35 +39,12 @@ j initfloat
 j main
 
 isRocketOnGround:
-lb isGasCon GasCon Error Sum
-lb isChuteCon ChuteCon Error Sum
 lb isPowerCon PowerCon Error Sum
-s db Setting RocketOnGround
 yield
-
-sub RocketOnGround RocketOnGround RocketOnGround
-s db Setting RocketOnGround
-yield
-
-add RocketOnGround RocketOnGround isGasCon
-s db Setting RocketOnGround
-yield
-
-add RocketOnGround RocketOnGround isChuteCon
-s db Setting RocketOnGround
-yield
-
-add RocketOnGround RocketOnGround isPowerCon
-s db Setting RocketOnGround
-yield
-
-seqz RocketOnGround RocketOnGround
-s db Setting RocketOnGround
-yield
-
+seqz RocketOnGround isPowerCon
 beq RocketOnGround TRUE countdown
 beq RocketOnGround FALSE initstart
-
+j main
 j error #code should never reach this line
 
 countdown:
@@ -101,7 +78,7 @@ initstart:
 sb Scanner On FALSE
 sb Miner On FALSE
 #sb Engine On TRUE
-#s db Setting 100
+s db Setting 100
 j main
 
 initmine:
@@ -126,3 +103,6 @@ sb Scanner On TRUE
 j main
 
 initfloat:
+sb Miner On FALSE
+sb Scanner On FALSE
+j main
