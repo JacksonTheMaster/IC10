@@ -1,0 +1,43 @@
+main:
+define SORTERENABLED 1
+define SORTER HASH("StructureLogicSorter")
+alias INGOT r15
+
+sbn HASH("StructureLogicDial") HASH("SELECTIngot") Mode 9
+lbn r0 HASH("StructureLogicDial") HASH("SELECTIngot") Setting Sum
+move INGOT 0
+
+# ItemSilverIngot, ItemGoldIngot, ItemCopperIngot, ItemIronIngot, ItemSiliconIngot,  ItemN
+brne r0 0 2
+move INGOT HASH("ItemGoldIngot")
+brne r0 1 2
+move INGOT HASH("ItemCopperIngot")
+brne r0 2 2
+move INGOT HASH("ItemIronIngot")
+brne r0 3 2
+move INGOT HASH("ItemSiliconIngot")
+brne r0 4 2
+move INGOT HASH("ItemNickelIngot")
+brne r0 5 2
+move INGOT HASH("ItemLeadIngot")
+brne r0 6 2
+move INGOT HASH("ItemSilverIngot")
+brne r0 7 2
+move INGOT HASH("ItemCoalOre")
+brne r0 8 2
+move INGOT HASH("ItemCobaltOre")
+brne r0 9 2
+move INGOT HASH("ItemUraniumOre")
+sbn HASH("StructureLogicMemory") HASH("MEMSort") Setting INGOT
+
+jal sortIngot
+j main
+
+sortIngot:
+move r1 INGOT #load hash into r1
+sll r1 r1 8 # move hash left 8 bits in r1 for SorterInstruction.FilterPrefabHashEquals
+or r1 r1 1 #add 1 (OPcode 1 ) to beginning of r1
+s d0 On SORTERENABLED # enable sorter
+clr d0
+put d0 0 r1
+j ra

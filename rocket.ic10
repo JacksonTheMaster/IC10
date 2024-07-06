@@ -77,7 +77,7 @@ j initstart
 initstart:
 sb Scanner On FALSE
 sb Miner On FALSE
-#sb Engine On TRUE
+sb Engine On TRUE
 s db Setting 100
 j main
 
