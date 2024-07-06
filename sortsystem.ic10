@@ -1,0 +1,72 @@
+main:
+define SORTERENABLED 1
+define SORTER HASH("StructureLogicSorter")
+define SorterIRON HASH("SORTIRON")
+define SorterSILVER HASH("SORTSILVER")
+define SorterGOLD HASH("SORTGOLD")
+define SorterCOPPER HASH("SORTCOPPER")
+define SorterSILICON HASH("SORTSILICON")
+define SorterNICKEL HASH("SORTNICKEL")
+define SorterLEAD HASH("SORTLEAD")
+define SorterCOAL HASH("SORTCOAL")
+define SorterCOBALT HASH("SORTCOBALT")
+define SorterURANIUM HASH("SORTURANIUM")
+
+define GoldIngot HASH("ItemGoldIngot")
+define CopperIngot HASH("ItemCopperIngot")
+define IronIngot HASH("ItemIronIngot")
+define SilverIngot HASH("ItemSilverIngot")
+define SiliconIngot HASH("ItemSiliconIngot")
+define NickelIngot HASH("ItemNickelIngot")
+define LeadIngot HASH("ItemLeadIngot")
+define CoalOre HASH("ItemCoalOre")
+define CobaltOre HASH("ItemCobaltOre")
+define UraniumOre HASH("ItemUraniumOre")
+
+alias INGOT r15
+alias CURRENTSORTER r14
+
+move INGOT 0
+move CURRENTSORTER 0
+move INGOT GoldIngot
+move CURRENTSORTER SorterGOLD
+jal prepareSorter
+move INGOT CopperIngot
+move CURRENTSORTER SorterCOPPER
+jal prepareSorter
+move INGOT IronIngot
+move CURRENTSORTER SorterIRON
+jal prepareSorter
+move INGOT SilverIngot
+move CURRENTSORTER SorterSILVER
+jal prepareSorter
+move INGOT SiliconIngot
+move CURRENTSORTER SorterSILICON
+jal prepareSorter
+move INGOT NickelIngot
+move CURRENTSORTER SorterNICKEL
+jal prepareSorter
+move INGOT LeadIngot
+move CURRENTSORTER SorterLEAD
+jal prepareSorter
+move INGOT CoalOre
+move CURRENTSORTER SorterCOAL
+jal prepareSorter
+move INGOT CobaltOre
+move CURRENTSORTER SorterCOBALT
+jal prepareSorter
+move INGOT UraniumOre
+move CURRENTSORTER SorterURANIUM
+jal prepareSorter
+j done
+
+prepareSorter:
+yield
+move r1 INGOT #load hash into r1
+sll r1 r1 8 # move hash left 8 bits in r1 for SorterInstruction.FilterPrefabHashEquals
+or r1 r1 1 #add 1 (OPcode 1 ) to beginning of r1
+sbn SORTER CURRENTSORTER On SORTERENABLED # enable sorter
+lbn r2 SORTER CURRENTSORTER ReferenceId Sum
+s db Setting r2
+putd r2 0 r1
+j ra
