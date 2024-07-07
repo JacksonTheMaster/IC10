@@ -1,0 +1,28 @@
+main:
+define FALSE 0
+define TRUE 1
+alias AVIONICS d0
+alias ENGINE d1
+alias PRESSUREREG d2
+alias CurrentTTW r0
+alias CurrentThrust r1
+alias ATMOSPHEREMODE r2
+
+l CurrentTTW AVIONICS ThrustToWeight
+sltz ATMOSPHEREMODE CurrentTTW # if CurrentTTW smaller than 0 return ATMOSPHEREMODE true
+beq ATMOSPHEREMODE TRUE atmosthrottle
+beq ATMOSPHEREMODE FALSE fullthrottle
+#l CurrentThrust
+j main
+
+atmosthrottle:
+s db Setting 15
+s PRESSUREREG On 1
+s PRESSUREREG Setting 15000
+j main
+
+fullthrottle:
+s db Setting 50
+s PRESSUREREG On 1
+s PRESSUREREG Setting 50000
+j main

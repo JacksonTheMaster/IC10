@@ -1,6 +1,21 @@
 main:
 define SORTERENABLED 1
+define TRUE 1
+define FALSE 0
 define SORTER HASH("StructureLogicSorter")
+define LEVER HASH("StructureLogicSwitch")
+define STACKER HASH("StructureStacker")
+define SILO HASH("StructureSDBSilo")
+define LeverIRON HASH("SORTSELIRON")
+define LeverSILVER HASH("SORTSELSILVER")
+define LeverGOLD HASH("SORTSELGOLD")
+define LeverCOPPER HASH("SORTSELCOPPER")
+define LeverSILICON HASH("SORTSELSILICON")
+define LeverNICKEL HASH("SORTSELNICKEL")
+define LeverLEAD HASH("SORTSELLEAD")
+define LeverCOAL HASH("SORTSELCOAL")
+define LeverCOBALT HASH("SORTSELCOBALT")
+define LeverURANIUM HASH("SORTSELURANIUM")
 define SorterIRON HASH("SORTIRON")
 define SorterSILVER HASH("SORTSILVER")
 define SorterGOLD HASH("SORTGOLD")
@@ -11,7 +26,6 @@ define SorterLEAD HASH("SORTLEAD")
 define SorterCOAL HASH("SORTCOAL")
 define SorterCOBALT HASH("SORTCOBALT")
 define SorterURANIUM HASH("SORTURANIUM")
-
 define GoldIngot HASH("ItemGoldIngot")
 define CopperIngot HASH("ItemCopperIngot")
 define IronIngot HASH("ItemIronIngot")
@@ -22,51 +36,83 @@ define LeadIngot HASH("ItemLeadIngot")
 define CoalOre HASH("ItemCoalOre")
 define CobaltOre HASH("ItemCobaltOre")
 define UraniumOre HASH("ItemUraniumOre")
-
 alias INGOT r15
 alias CURRENTSORTER r14
+alias CURRENTSORTERREF r13
+alias CURRENTLEVER r12
+alias CURRENTLEVERSETTING r11
+alias ENABLE r10
 
 move INGOT 0
 move CURRENTSORTER 0
+move CURRENTSORTERREF 0
+move CURRENTLEVER FALSE
+move ENABLE FALSE
+
+lb ENABLE LEVER Setting Sum
+sgtz ENABLE ENABLE
+beq ENABLE FALSE shutdown
+sb STACKER On TRUE
+sb SILO On TRUE
 move INGOT GoldIngot
 move CURRENTSORTER SorterGOLD
+move CURRENTLEVER LeverGOLD
 jal prepareSorter
 move INGOT CopperIngot
 move CURRENTSORTER SorterCOPPER
+move CURRENTLEVER LeverCOPPER
 jal prepareSorter
 move INGOT IronIngot
 move CURRENTSORTER SorterIRON
+move CURRENTLEVER LeverIRON
 jal prepareSorter
 move INGOT SilverIngot
 move CURRENTSORTER SorterSILVER
+move CURRENTLEVER LeverSILVER
 jal prepareSorter
 move INGOT SiliconIngot
 move CURRENTSORTER SorterSILICON
+move CURRENTLEVER LeverSILICON
 jal prepareSorter
 move INGOT NickelIngot
 move CURRENTSORTER SorterNICKEL
+move CURRENTLEVER LeverNICKEL
 jal prepareSorter
 move INGOT LeadIngot
 move CURRENTSORTER SorterLEAD
+move CURRENTLEVER LeverLEAD
 jal prepareSorter
 move INGOT CoalOre
 move CURRENTSORTER SorterCOAL
+move CURRENTLEVER LeverCOAL
 jal prepareSorter
 move INGOT CobaltOre
 move CURRENTSORTER SorterCOBALT
+move CURRENTLEVER LeverCOBALT
 jal prepareSorter
 move INGOT UraniumOre
 move CURRENTSORTER SorterURANIUM
+move CURRENTLEVER LeverURANIUM
 jal prepareSorter
-j done
+j main
 
 prepareSorter:
 yield
 move r1 INGOT #load hash into r1
 sll r1 r1 8 # move hash left 8 bits in r1 for SorterInstruction.FilterPrefabHashEquals
 or r1 r1 1 #add 1 (OPcode 1 ) to beginning of r1
+
+
 sbn SORTER CURRENTSORTER On SORTERENABLED # enable sorter
-lbn r2 SORTER CURRENTSORTER ReferenceId Sum
-s db Setting r2
-putd r2 0 r1
+lbn CURRENTSORTERREF SORTER CURRENTSORTER ReferenceId Sum
+lbn CURRENTLEVERSETTING LEVER CURRENTLEVER Setting Sum
+clrd CURRENTSORTERREF #clear sorter memory
+beq CURRENTLEVERSETTING FALSE ra
+putd CURRENTSORTERREF 0 r1
 j ra
+
+shutdown:
+sb SORTER On FALSE
+sb STACKER On FALSE
+sb SILO On FALSE
+j main
