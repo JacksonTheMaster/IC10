@@ -1,0 +1,45 @@
+main:
+define TRUE 1
+define FALSE 0
+alias DISPLAY d0
+define GasCon HASH("StructureGasUmbilicalMale")
+define ChuteCon HASH("StructureChuteUmbilicalMale")
+define PowerCon HASH("StructurePowerUmbilicalMale")
+define LEVER HASH("StructureLogicSwitch")
+define UMBILILCALLEVER HASH("Umbilicals Switch")
+define BLASTDOOR HASH("StructureBlastDoor")
+define ROCKETDOOR HASH("DoorRockets")
+define GSENSOR HASH("StructureGasSensor")
+define ROCKETROOMTEMPSENS HASH("ROCKETROOMTEMPSENS")
+alias LEVERSETTING r15
+
+
+
+define AVIONICS HASH("StructureRocketAvionics")
+lb r1 AVIONICS Thrust Sum
+lb r2 AVIONICS ThrustToWeight Sum
+#sgtz r2 r2
+s DISPLAY Setting r1
+s DISPLAY Color 2
+jal door
+jal umbilicals
+s DISPLAY Setting r2
+s DISPLAY Color 3
+j main
+
+umbilicals:
+lbn LEVERSETTING LEVER UMBILILCALLEVER Open Sum
+sb GasCon Open LEVERSETTING
+sb ChuteCon Open LEVERSETTING
+sb PowerCon Open LEVERSETTING
+j ra
+
+door:
+lbn r14 GSENSOR ROCKETROOMTEMPSENS Temperature Sum
+bgt r14 375 closedoor
+sbn BLASTDOOR ROCKETDOOR Open 1
+j ra
+
+closedoor:
+sbn BLASTDOOR ROCKETDOOR Open 0
+j main

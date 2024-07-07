@@ -1,4 +1,5 @@
 define Engine HASH("StructureGovernedGasEngine")
+define Engine2 HASH("StructurePressureFedGasEngine")
 define Avionics HASH("StructureRocketAvionics")
 define Scanner HASH("StructureRocketScanner")
 define Miner HASH("StructureRocketMiner")
@@ -71,6 +72,8 @@ sleep 1.5
 sb Speaker Mode 35
 s db Setting 35
 sleep 1.5
+sb Speaker Mode 7
+sleep 4
 sb Speaker On 0
 j initstart
 
@@ -78,6 +81,7 @@ initstart:
 sb Scanner On FALSE
 sb Miner On FALSE
 sb Engine On TRUE
+sb Engine2 On TRUE
 s db Setting 100
 j main
 

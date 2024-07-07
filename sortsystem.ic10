@@ -53,7 +53,7 @@ lb ENABLE LEVER Setting Sum
 sgtz ENABLE ENABLE
 beq ENABLE FALSE shutdown
 sb STACKER On TRUE
-sb SILO On TRUE
+sb SILO Open TRUE
 move INGOT GoldIngot
 move CURRENTSORTER SorterGOLD
 move CURRENTLEVER LeverGOLD
@@ -114,5 +114,5 @@ j ra
 shutdown:
 sb SORTER On FALSE
 sb STACKER On FALSE
-sb SILO On FALSE
+sb SILO Open FALSE
 j main
