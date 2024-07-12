@@ -3,9 +3,14 @@ define TRUE 1
 define FALSE 0
 define LOWBATTERYTHRESHOLD 3000000 # use 3000000 for both batteries, 3000000 for 1
 define HIGHBATTERYTHRESHOLD 17000000 # use 17000000 for both batteries, 8500000 for 1
+define BATTERY HASH("StructureBatteryLarge")
+define BATTERYGRID HASH("GENROOM BATTERY")
 define SPEAKER HASH("StructureKlaxon")
 define REBURNALARM HASH("REBURNALARM")
-
+define DISPLAYLARGE HASH("StructureConsoleLED1x3")
+define POWERDISPLAY HASH("PowerDisplayGasGen")
+define GENERATOR HASH("StructureGasGenerator")
+define GASGEN HASH("BURN.GENERATOR")
 #RETURN CODES
 #return 0 = off - logic
 #return 1 = OK, Burning
@@ -19,37 +24,43 @@ alias BATTERY0 d3
 alias BATTERY1 d4
 alias WARN d5
 alias GENERATORRUNNING r15
-
-l r0 MIX Setting
-l r1 GENERATOR PowerGeneration
-l r3 BATTERY0 Charge
-
-l r4 BATTERY1 Charge
-add r3 r3 r4 #use both batteries
-s db Setting r3
-yield
-beq r0 6 disableGenerator # if MIXING is 6 - status  off - User Intervention
-ble r3 LOWBATTERYTHRESHOLD enableGenerator
-bge r3 HIGHBATTERYTHRESHOLD disableGenerator
+alias BATTERYPERCENTAGE r14
+alias BATTERYCHARGE r13
+alias BATTERYIN r12
+alias BATTERYOUT r11
+alias BATTERYRATIO r10
+alias MIXERSETTING r9
+alias POWERGEN r8
+alias CLOCK r7
+alias CHARGEPOWER r6
+l MIXERSETTING MIX Setting
+l POWERGEN GENERATOR PowerGeneration
+#l r3 BATTERY0 Charge
+#l r4 BATTERY1 Charge
+jal clock
+jal batterydisplay
+#add r3 r3 r4 #use both batteries
+beq MIXERSETTING 6 disableGenerator # if MIXING is 6 - status  off - User Intervention
+ble BATTERYCHARGE LOWBATTERYTHRESHOLD enableGenerator
+bge BATTERYCHARGE HIGHBATTERYTHRESHOLD disableGenerator
 # if we end up here, we where charing but had a fault in the generator. we need to turn it
 beq GENERATORRUNNING 1 enableGenerator
 s RETURN Setting 2 # return Uncaught Error
 # this is a hack to get around the fact that the generator is not restarting to on  automa
 
 #does this do anything? comment out for now
-# runs without this shitty failsafe, so it's probably not needed.
 #sbn SPEAKER REBURNALARM On 0
 #s WARN On FALSE
 j main
 
 enableGenerator:
-beq r0 1 preburn # if MIXING is status OK
-beq r0 3 preburn # if MIXING is status waiting
+beq MIXERSETTING 1 preburn # if MIXING is status OK
+beq MIXERSETTING 3 preburn # if MIXING is status waiting
 j disableGenerator
 
 preburn:
 move GENERATORRUNNING 1
-beq r1 0 reburn
+beq POWERGEN 0 reburn
 s RETURN Setting 1 # return OK
 s WARN On FALSE
 
@@ -76,3 +87,34 @@ j main
 # the execution shouldn't be here
 s RETURN Setting 2 # return Uncaught Error
 j disableGenerator
+
+batterydisplay:
+lbn BATTERYRATIO BATTERY BATTERYGRID Ratio Average
+lbn BATTERYCHARGE BATTERY BATTERYGRID Charge Sum
+lbn BATTERYOUT BATTERY BATTERYGRID PowerActual Average
+sub CHARGEPOWER POWERGEN BATTERYOUT
+
+brne CLOCK 5 4
+sbn DISPLAYLARGE POWERDISPLAY Mode 1
+sbn DISPLAYLARGE POWERDISPLAY Color 3
+sbn DISPLAYLARGE POWERDISPLAY Setting BATTERYRATIO
+brne CLOCK 10 4
+sbn DISPLAYLARGE POWERDISPLAY Mode 2
+sbn DISPLAYLARGE POWERDISPLAY Color 11
+sbn DISPLAYLARGE POWERDISPLAY Setting BATTERYCHARGE
+brne CLOCK 15 4
+sbn DISPLAYLARGE POWERDISPLAY Mode 2
+sbn DISPLAYLARGE POWERDISPLAY Color 2
+sbn DISPLAYLARGE POWERDISPLAY Setting CHARGEPOWER
+j ra
+
+
+clock:
+yield
+add CLOCK CLOCK 1
+bgt CLOCK 20 resetclock
+j ra
+
+resetclock:
+move CLOCK 0
+j ra
