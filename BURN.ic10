@@ -1,8 +1,8 @@
 main:
 define TRUE 1
 define FALSE 0
-define LOWBATTERYTHRESHOLD 1000000
-define HIGHBATTERYTHRESHOLD 8000000
+define LOWBATTERYTHRESHOLD 3000000 # use 3000000 for both batteries, 3000000 for 1
+define HIGHBATTERYTHRESHOLD 17000000 # use 17000000 for both batteries, 8500000 for 1
 define SPEAKER HASH("StructureKlaxon")
 define REBURNALARM HASH("REBURNALARM")
 
@@ -16,15 +16,30 @@ alias RETURN db
 alias MIX d0
 alias GENERATOR d1
 alias BATTERY0 d3
+alias BATTERY1 d4
 alias WARN d5
+alias GENERATORRUNNING r15
 
 l r0 MIX Setting
 l r1 GENERATOR PowerGeneration
 l r3 BATTERY0 Charge
+
+l r4 BATTERY1 Charge
+add r3 r3 r4 #use both batteries
+s db Setting r3
+yield
+beq r0 6 disableGenerator # if MIXING is 6 - status  off - User Intervention
 ble r3 LOWBATTERYTHRESHOLD enableGenerator
 bge r3 HIGHBATTERYTHRESHOLD disableGenerator
-sbn SPEAKER REBURNALARM On 0
-s WARN On FALSE
+# if we end up here, we where charing but had a fault in the generator. we need to turn it
+beq GENERATORRUNNING 1 enableGenerator
+s RETURN Setting 2 # return Uncaught Error
+# this is a hack to get around the fact that the generator is not restarting to on  automa
+
+#does this do anything? comment out for now
+# runs without this shitty failsafe, so it's probably not needed.
+#sbn SPEAKER REBURNALARM On 0
+#s WARN On FALSE
 j main
 
 enableGenerator:
@@ -33,6 +48,7 @@ beq r0 3 preburn # if MIXING is status waiting
 j disableGenerator
 
 preburn:
+move GENERATORRUNNING 1
 beq r1 0 reburn
 s RETURN Setting 1 # return OK
 s WARN On FALSE
@@ -51,6 +67,7 @@ sbn SPEAKER REBURNALARM On 0
 j main
 
 disableGenerator:
+move GENERATORRUNNING 0
 s GENERATOR On FALSE
 s RETURN Setting 0 # return off - logic
 s WARN On FALSE
@@ -58,4 +75,4 @@ j main
 
 # the execution shouldn't be here
 s RETURN Setting 2 # return Uncaught Error
-j disableGenerator                                                                                                                                  
+j disableGenerator

@@ -1,0 +1,79 @@
+init:
+define TRUE 1
+define FALSE 0
+define MINEXTTEMP 274
+define MINEXTPRESSURE 40
+define MAXEXTPRESSURE 80
+define MAXEXTTEMP 323
+define SKIPONELINE 2
+alias ALERTSTORE r15
+alias SUIT db
+alias HELMET d0
+alias BACK d1
+alias CURRENTEXTTEMP r14
+alias CURRENTEXTPRESSURE r13
+alias SAFE r12
+alias TEMP r0
+l ALERTSTORE SUIT Setting
+j main
+
+main:
+bnez ALERTSTORE alert
+jal helmet
+yield
+breq SAFE TRUE SKIPONELINE
+jal unsafesetting
+breq SAFE FALSE SKIPONELINE
+jal safesetting
+j init
+
+alert:
+s d0 SoundAlert ALERTSTORE
+yield
+move ALERTSTORE FALSE
+s d0 SoundAlert FALSE
+j main
+
+
+helmet:
+l CURRENTEXTTEMP SUIT TemperatureExternal
+sgt TEMP CURRENTEXTTEMP MINEXTTEMP
+brne TEMP FALSE SKIPONELINE
+j unsafe
+slt TEMP CURRENTEXTTEMP MAXEXTTEMP
+brne TEMP FALSE SKIPONELINE
+j unsafe
+l CURRENTEXTPRESSURE SUIT PressureExternal
+sgt TEMP CURRENTEXTPRESSURE MINEXTPRESSURE
+brne TEMP FALSE SKIPONELINE
+j unsafe
+slt TEMP CURRENTEXTPRESSURE MAXEXTPRESSURE
+brne TEMP FALSE SKIPONELINE
+j unsafe
+move SAFE TRUE
+j ra
+
+
+unsafe:
+move SAFE FALSE
+j ra
+
+safesetting:
+#s d0 SoundAlert 6
+s HELMET Open TRUE
+s HELMET Lock FALSE
+s db AirRelease FALSE
+s db Filtration FALSE
+s db On FALSE
+yield
+j ra
+
+unsafesetting:
+#s d0 SoundAlert 6
+s HELMET Open FALSE
+s HELMET Lock TRUE
+s db AirRelease TRUE
+s db Filtration TRUE
+s db On TRUE
+yield
+j ra
