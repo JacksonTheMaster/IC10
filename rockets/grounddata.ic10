@@ -35,8 +35,8 @@ sb PowerCon Open LEVERSETTING
 j ra
 
 door:
-lbn r14 GSENSOR ROCKETROOMTEMPSENS Temperature Sum
-bgt r14 375 closedoor
+lbn r14 GSENSOR ROCKETROOMTEMPSENS Temperature Maximum
+bgt r14 200 closedoor
 sbn BLASTDOOR ROCKETDOOR Open 1
 j ra
 
