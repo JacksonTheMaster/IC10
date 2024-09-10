@@ -1,0 +1,22 @@
+# Encoding Script: Combine NUMBER1 and NUMBER2
+
+define NUMBER1 2134647745
+define NUMBER2 17
+
+### Combining NUMBER1 and NUMBER2
+
+# Load the first number (NUMBER1)
+move r0 NUMBER1         # Load NUMBER1 into r0
+
+# Shift NUMBER1 to the left to make room for NUMBER2
+sll r0 r0 16            # Shift NUMBER1 left by 16 bits
+
+# Load the second number (NUMBER2)
+move r1 NUMBER2         # Load NUMBER2 into r1
+
+# Combine the two numbers by adding them together
+add r0 r0 r1            # r0 now contains the combined number
+
+# Output the combined result
+s db Setting r0         # Output the combined number for use in decoding
+sleep 2
