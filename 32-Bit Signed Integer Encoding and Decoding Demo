@@ -1,0 +1,36 @@
+main:
+define NUMBER1 545937711
+define NUMBER2 17
+
+### Combining NUMBER1 and NUMBER2
+
+# Load the first number (NUMBER1)
+move r0 NUMBER1         # Load NUMBER1 into r0
+
+# Shift NUMBER1 to the left to make room for NUMBER2
+sll r0 r0 16            # Shift NUMBER1 left by 16 bits
+
+# Load the second number (NUMBER2)
+move r1 NUMBER2         # Load NUMBER2 into r1
+
+# Combine the two numbers by adding them together
+add r0 r0 r1            # r0 now contains the combined number
+
+# Store the combined result in r2 for decoding later
+move r2 r0              # Store the combined number in r2
+s db Setting r2         # Output the combined number for debugging
+sleep 2
+
+### Decoding the combined number
+
+# Retrieve NUMBER1 from the combined value
+srl r3 r2 16            # Shift right by 16 bits to get the original NUMBER1
+s db Setting r3         # Output the decoded NUMBER1
+sleep 2
+
+# Retrieve NUMBER2 from the combined value
+and r4 r2 65535         # Mask the lower 16 bits to get NUMBER2
+s db Setting r4         # Output the decoded NUMBER2
+sleep 2
+
+j main                  # Loop back to main
