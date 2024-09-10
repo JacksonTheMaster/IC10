@@ -1,0 +1,16 @@
+# Decoding Script: Decode the combined number
+
+# Load the combined number (from the encoding script or elsewhere)
+move r2 COMBINED_NUMBER   # Replace COMBINED_NUMBER with the actual combined value
+
+### Decoding the combined number
+
+# Retrieve NUMBER1 from the combined value
+srl r3 r2 16            # Shift right by 16 bits to get the original NUMBER1
+s db Setting r3         # Output the decoded NUMBER1
+sleep 2
+
+# Retrieve NUMBER2 from the combined value
+and r4 r2 65535         # Mask the lower 16 bits to get NUMBER2
+s db Setting r4         # Output the decoded NUMBER2
+sleep 2
