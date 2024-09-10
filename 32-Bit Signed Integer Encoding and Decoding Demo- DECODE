@@ -1,7 +1,7 @@
 # Decoding Script: Decode the combined number
-
+define COMBINEDNUMBER 139896274616337
 # Load the combined number (from the encoding script or elsewhere)
-move r2 COMBINED_NUMBER   # Replace COMBINED_NUMBER with the actual combined value
+move r2 COMBINEDNUMBER   # Replace COMBINED_NUMBER with the actual combined value
 
 ### Decoding the combined number
 
