@@ -1,0 +1,37 @@
+main:
+### Configuration ###
+define REGISTERSIZE 54
+define NUMBER1 -35184372088831
+define NUMBER2 -127
+define SHIFTBITS 8
+
+alias SHIFTBITSDECIMAL r15
+alias SHIFTLEFT r14
+
+### Compute 2^SHIFTBITS ###
+move SHIFTBITSDECIMAL 1
+sll SHIFTBITSDECIMAL SHIFTBITSDECIMAL SHIFTBITS
+sub SHIFTBITSDECIMAL SHIFTBITSDECIMAL 1
+sub SHIFTLEFT REGISTERSIZE SHIFTBITS
+
+### Encoding ###
+move r0 NUMBER1
+sll r0 r0 SHIFTBITS
+move r1 NUMBER2
+and r1 r1 SHIFTBITSDECIMAL
+or r0 r0 r1
+move r2 r0
+s db Setting r2
+sleep 2
+
+### Decoding ###
+sra r3 r2 SHIFTBITS
+s db Setting r3
+sleep 2
+and r4 r2 SHIFTBITSDECIMAL
+sll r4 r4 SHIFTLEFT
+sra r4 r4 SHIFTLEFT
+s db Setting r4
+sleep 2
+
+j main
