@@ -1,0 +1,19 @@
+main:
+move r0 -35184372088831
+sll r0 r0 8
+move r1 -127
+and r1 r1 255
+or r0 r0 r1
+move r2 r0
+s db Setting r2
+sleep 2
+### Decoding ###
+sra r3 r2 8
+s db Setting r3
+sleep 2
+and r4 r2 255
+sll r4 r4 46
+sra r4 r4 46
+s db Setting r4
+sleep 2
+j main
